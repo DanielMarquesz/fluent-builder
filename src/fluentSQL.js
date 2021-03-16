@@ -24,7 +24,12 @@ export default class FluentSQLBuilder {
   }
 
   where(query) {
-    this.#where = query
+    const [[prop, selectedValue]] = Object.entries(query)
+    const whereFilter = selectedValue instanceof RegExp ? 
+    selectedValue : new RegExp(selectedValue)
+
+    this.#where.push({ prop, filter: whereFilter })
+
     return this
   }
 
@@ -37,10 +42,34 @@ export default class FluentSQLBuilder {
     return this.#limit && results.length === this.#limit
   }
 
+  #performWhere(item) {
+    for(const { filter, prop } of this.#where) {
+      if(!filter.test(item[prop])) return false
+    }
+
+    return true
+  }
+
+  #perfomSelect(item) {
+    const currentItem = {}
+    const entries = Object.entries(item)
+    for(const [key, value] of entries) {
+
+      if(this.#select.length && !this.#select.includes(key)) continue
+      
+      currentItem[key] = value
+    }
+
+    return currentItem
+  }
+
   build() {
     const results = []
     for (let item of this.#database) {
-      results.push(item)
+      if(!this.#performWhere(item)) continue
+
+      const currentItem = this.#perfomSelect(item)
+      results.push(currentItem)
 
       if(this.#performLimit(results)) break
     }
