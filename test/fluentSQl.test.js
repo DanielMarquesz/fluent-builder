@@ -3,19 +3,19 @@ import FluentSQLBuilder from "../src/fluentSQL"
 
 const data = [
   {
+    id: 0,
+    name: 'erick',
+    category: 'developer'
+  },
+  {
     id: 1,
-    name: "Daniel",
-    category: "Intern"
+    name: 'mariazinha',
+    category: 'developer'
   },
   {
     id: 2,
-    name: "Maria",
-    category: "developer"
-  },
-  {
-    id: 3,
-    name: "Sonia",
-    category: "Manager"
+    name: 'joaozin',
+    category: 'manager',
   },
 ]
 
@@ -45,7 +45,7 @@ describe('Test suite for FluentSQL Builder', () => {
       category: /^dev/
     }).build()
 
-    const expected = data.filter(({ category }) => category.slice(0, 3) === 'dev')
+    const expected = data.filter(({ category }) => category.slice(0, 3) === 'dev')    
     expect(result).toStrictEqual(expected)
   })
 
@@ -57,7 +57,39 @@ describe('Test suite for FluentSQL Builder', () => {
     expect(result).toStrictEqual(expected)
   })
 
-  test.todo('#orderBy given a collection it should order by filter name')
+  test('#orderBy given a collection it should order by filter name', () => {
+    const result = FluentSQLBuilder.for(data).orderBy('name').build()
 
-  test.todo('pipeline')
+    const expected = [
+      {
+        id: 0,
+        name: 'erick',
+        category: 'developer'
+      },
+      {
+        id: 2,
+        name: 'joaozin',
+        category: 'manager',
+      },
+      {
+        id: 1,
+        name: 'mariazinha',
+        category: 'developer'
+      },
+    ]
+    expect(result).toStrictEqual(expected)
+  })
+
+  test('pipeline', () => {
+    const result = FluentSQLBuilder
+    .for(data)
+    .where({ category: 'developer'})
+    .where({ name: 'm' })    
+    .select(['name', 'category'])
+    .orderBy('name')
+    .build()
+    
+    const expected = data.filter(({ id }) => id === 1).map(({ name, category }) => ({ name, category }))
+    expect(result).toStrictEqual(expected)    
+  })
 })
