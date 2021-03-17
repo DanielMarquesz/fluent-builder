@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node --experimental-json-modules src/",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --config jest.config.mjs",
     "test:cov": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --config jest.config.mjs --coverage",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --config jest.config.mjs --watchAll"
