@@ -35,6 +35,7 @@ export default class FluentSQLBuilder {
 
   orderBy(field) {
     this.#orderBy = field
+
     return this
   }
 
@@ -58,9 +59,17 @@ export default class FluentSQLBuilder {
       if(this.#select.length && !this.#select.includes(key)) continue
       
       currentItem[key] = value
-    }
-
+    }    
     return currentItem
+  }
+
+  #performOrderBy(results) {
+
+    if(!this.#orderBy) return results
+
+    return results.sort((prev, next) => {           
+      if (prev[this.#orderBy] != undefined) return prev[this.#orderBy].localeCompare(next[this.#orderBy])      
+    })
   }
 
   build() {
@@ -70,9 +79,10 @@ export default class FluentSQLBuilder {
 
       const currentItem = this.#perfomSelect(item)
       results.push(currentItem)
-
+      
       if(this.#performLimit(results)) break
     }
-    return results
+    const finalResult = this.#performOrderBy(results) 
+    return finalResult
   }
 }
